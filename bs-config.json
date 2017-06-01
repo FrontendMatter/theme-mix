@@ -1,0 +1,10 @@
+{
+  "port": 3000,
+  "files": ["./dist/**/*.{html,css,js}"],
+  "server": { "baseDir": "./dist" },
+  "injectChanges": true,
+  "notify": false,
+  "ghostMode": false,
+  "logLevel": "silent",
+  "proxy": null
+}

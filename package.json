@@ -1,0 +1,25 @@
+{
+  "name": "theme-mix",
+  "version": "0.1.0",
+  "author": "FrontendMatter <contact@frontendmatter.com> (http://themeforest.net/user/frontendmatter/portfolio)",
+  "dependencies": {
+    "del": "^2.2.2",
+    "front-matter-loader": "^0.1.2",
+    "fs-simple-cache": "^1.0.0",
+    "jsbeautify-loader": "^0.3.0",
+    "laravel-mix": "^0.10.0",
+    "lodash.merge": "^4.6.0",
+    "nunjucks-html-loader": "github:lazabogdan/nunjucks-html-loader#front-matter",
+    "sass-importer-npm": "^1.0.2",
+    "webpack-rtl-plugin": "^1.6.0",
+    "webpack-rtl-wrap-plugin": "^1.2.0",
+    "webpack-sources": "^0.2.3",
+    "yargs": "^7.0.2"
+  },
+  "description": "Webpack config for FrontendMatter HTML Themes",
+  "main": "webpack.mix.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "license": "ISC"
+}
