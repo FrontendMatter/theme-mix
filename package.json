@@ -1,8 +1,9 @@
 {
   "name": "theme-mix",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": "FrontendMatter <contact@frontendmatter.com> (http://themeforest.net/user/frontendmatter/portfolio)",
   "dependencies": {
+    "async": "^2.4.1",
     "del": "^2.2.2",
     "front-matter-loader": "^0.1.2",
     "fs-simple-cache": "^1.0.0",
