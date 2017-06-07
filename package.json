@@ -10,6 +10,7 @@
     "jsbeautify-loader": "^0.3.0",
     "laravel-mix": "^0.10.0",
     "lodash.merge": "^4.6.0",
+    "merge-config": "^2.0.0",
     "nunjucks-html-loader": "github:lazabogdan/nunjucks-html-loader#front-matter",
     "sass-importer-npm": "^1.0.2",
     "webpack-rtl-plugin": "^1.6.0",

@@ -6,6 +6,31 @@ const del     = require('del')
 const merge   = require('webpack-merge').smart
 let webpackConfig = {}
 
+///////////////////
+// Configuration //
+///////////////////
+
+const Config = require('merge-config')
+let config = new Config().merge({
+  runTasks: {
+    clean: true,
+    js: true,
+    copy: true,
+    sass: true,
+    html: true,
+  },
+  enableCssThemes: true,
+})
+
+try {
+  config.file(path.join(process.cwd(), 'theme-mix.yaml'))
+  config.file(path.join(process.cwd(), 'theme-mix.json'))
+}
+catch (e) {}
+
+console.log(config.get())
+process.exit()
+
 ///////////////////////////////////////////
 // RUN SPECIFIC TASKS                    //
 // npm run development -- --env.run html //
@@ -22,6 +47,7 @@ const __RUN = argv.env ? argv.env.run : undefined
 
 if (__RUN === 'clean' || !__RUN) {
   del.sync([
+    'temp/',
     'dist/**/*.html',
     'dist/assets/{css,fonts,js,vendor}'
   ])
@@ -46,7 +72,7 @@ if (__RUN === 'js' || !__RUN) {
 // npm run development -- --env.run copy
 if (__RUN === 'copy' || !__RUN) {
   try {
-    require(path.join(process.cwd(), 'copy-vendor-assets.json')).forEach(function(asset) {
+    require(path.join(process.cwd(), 'theme-mix.copy.json')).forEach(function(asset) {
       var dest = path.join(process.cwd(), 'dist/assets/vendor')
       var src = asset
       if (asset instanceof Object) {
