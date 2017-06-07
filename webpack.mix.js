@@ -22,18 +22,31 @@ config.merge({
     html: true,
   },
   enableCssThemes: true,
-  // create .rtl.css
+  // create additional .rtl.css
   enableCssRTL: true,
-  // node_modules assets list i.e. 
+  // copy assets list i.e. 
+  // copyCwd: 'node_modules'
+  // copyDest: 'dist/assets/vendor'
   // copy: ['bootstrap/dist/bootstrap.js']
-  // => will get copied to dist/assets/vendor/bootstrap.js
+  // => will copy node_modules/bootstrap/dist/bootstrap.js to dist/assets/vendor/bootstrap.js
+  copyCwd: 'node_modules',
+  copyDest: 'dist/assets/vendor',
   copy: [],
   // options passed to laravel-mix
   laravelMixOptions: {
     // ignore fonts
-    processCssUrls: false
+    processCssUrls: false,
   },
-  browserSync: require('./bs-config.json')
+  browserSync: require('./bs-config.json'),
+  clean: [
+    'dist/**/*.html',
+    'dist/assets/{css,fonts,js,vendor}',
+  ],
+  sassSrc: 'src/sass/*.scss',
+  cssDest: './dist/assets/css',
+  jsSrc: './src/js/**/**.{js,vue}',
+  jsDest: './dist/assets/js',
+  htmlDest: 'dist/[path][name].html',
 })
 
 ////////////////////////
@@ -64,12 +77,10 @@ const __RUN = argv.env ? argv.env.run : undefined
 // CLEANUP //
 /////////////
 
+del.sync('temp/')
+
 if (__RUN === 'clean' || (!__RUN && config.get('runTasks:clean'))) {
-  del.sync([
-    'temp/',
-    'dist/**/*.html',
-    'dist/assets/{css,fonts,js,vendor}'
-  ])
+  del.sync(config.get('clean'))
 }
 
 ////////
@@ -78,8 +89,8 @@ if (__RUN === 'clean' || (!__RUN && config.get('runTasks:clean'))) {
 
 // npm run development -- --env.run js
 if (__RUN === 'js' || (!__RUN && config.get('runTasks:js'))) {
-  for (let file of glob.sync('./src/js/**/**.{js,vue}', { ignore: '**/_*' })) {
-    mix.js(file, './dist/assets/js')
+  for (let file of glob.sync(config.get('jsSrc'), { ignore: '**/_*' })) {
+    mix.js(file, config.get('jsDest'))
   }
 }
 
@@ -90,20 +101,17 @@ if (__RUN === 'js' || (!__RUN && config.get('runTasks:js'))) {
 
 // npm run development -- --env.run copy
 if (__RUN === 'copy' || (!__RUN && config.get('runTasks:copy'))) {
-  try {
-    require(path.join(process.cwd(), 'theme-mix.copy.json')).forEach(function(asset) {
-      var dest = path.join(process.cwd(), 'dist/assets/vendor')
-      var src = asset
-      if (asset instanceof Object) {
-        src = Object.keys(asset).pop()
-        dest = Object.values(asset).pop()
-      }
-      for (let file of glob.sync(src, { cwd: path.join(process.cwd(), 'node_modules/') })) {
-        mix.copy(path.join(process.cwd(), 'node_modules', file), dest)
-      }
-    })
-  }
-  catch (e) {}
+  config.get('copy').forEach(function(asset) {
+    var dest = path.join(process.cwd(), config.get('copyDest'))
+    var src = asset
+    if (asset instanceof Object) {
+      src = Object.keys(asset).pop()
+      dest = Object.values(asset).pop()
+    }
+    for (let file of glob.sync(src, { cwd: path.join(process.cwd(), config.get('copyCwd')) })) {
+      mix.copy(path.join(process.cwd(), config.get('copyCwd'), file), dest)
+    }
+  })
 }
 
 //////////
@@ -117,7 +125,7 @@ const __THEME = argv.env ? argv.env.theme || 'default' : 'default'
 
 // npm run development -- --env.run sass
 if (__RUN === 'sass' || (!__RUN && config.get('runTasks:sass'))) {
-  let __DIST_CSS = './dist/assets/css'
+  let __DIST_CSS = config.get('cssDest')
   let sassOptions = { 
     importer: require('sass-importer-npm'),
   }
@@ -128,7 +136,7 @@ if (__RUN === 'sass' || (!__RUN && config.get('runTasks:sass'))) {
     __DIST_CSS += '/themes/' + __THEME
   }
 
-  for (let file of glob.sync('src/sass/*.scss', { ignore: '**/_*' })) {
+  for (let file of glob.sync(config.get('sassSrc'), { ignore: '**/_*' })) {
     mix.sass(file, __DIST_CSS, sassOptions)
   }
 
@@ -195,7 +203,7 @@ if (__RUN === 'html' || (!__RUN && config.get('runTasks:html'))) {
         loaders: [{
           loader: 'file-loader',
           options: {
-            name: 'dist/[path][name].html',
+            name: config.get('htmlDest'),
             context: './src/html/pages',
             useRelativePath: true
           }
