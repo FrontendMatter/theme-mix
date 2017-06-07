@@ -32,12 +32,6 @@ config.merge({
   copyCwd: 'node_modules',
   copyDest: 'dist/assets/vendor',
   copy: [],
-  // options passed to laravel-mix
-  laravelMixOptions: {
-    // ignore fonts
-    processCssUrls: false,
-  },
-  browserSync: require('./bs-config.json'),
   clean: [
     'dist/**/*.html',
     'dist/assets/{css,fonts,js,vendor}',
@@ -47,6 +41,12 @@ config.merge({
   jsSrc: 'src/js/**/**.{js,vue}',
   jsDest: 'dist/assets/js',
   htmlDest: 'dist/[path][name].html',
+  // options passed to laravel-mix
+  laravelMixOptions: {
+    // ignore fonts
+    processCssUrls: false,
+  },
+  browserSync: require('./bs-config.json'),
 })
 
 ////////////////////////
