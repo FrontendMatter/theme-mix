@@ -43,9 +43,9 @@ config.merge({
     'dist/assets/{css,fonts,js,vendor}',
   ],
   sassSrc: 'src/sass/*.scss',
-  cssDest: './dist/assets/css',
-  jsSrc: './src/js/**/**.{js,vue}',
-  jsDest: './dist/assets/js',
+  cssDest: 'dist/assets/css',
+  jsSrc: 'src/js/**/**.{js,vue}',
+  jsDest: 'dist/assets/js',
   htmlDest: 'dist/[path][name].html',
 })
 
