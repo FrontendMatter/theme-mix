@@ -50,9 +50,6 @@ catch (e) {
   }
 }
 
-// console.log(config.get())
-// process.exit()
-
 ///////////////////////////////////////////
 // RUN SPECIFIC TASKS                    //
 // npm run development -- --env.run html //
