@@ -192,7 +192,7 @@ if (__RUN === 'sass' || (!__RUN && config.get('runTasks:sass'))) {
 
 // npm run development -- --env.run html
 if (__RUN === 'html' || (!__RUN && config.get('runTasks:html'))) {
-  for (let file of glob.sync('./src/html/pages/*.html', { ignore: '**/_*' })) {
+  for (let file of glob.sync('src/html/pages/*.html', { ignore: '**/_*' })) {
     Mix.entry().entry.add('mix', path.resolve(file))
   }
 

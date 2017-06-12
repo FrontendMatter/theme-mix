@@ -1,6 +1,6 @@
 {
   "name": "theme-mix",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "author": "FrontendMatter <contact@frontendmatter.com> (http://themeforest.net/user/frontendmatter/portfolio)",
   "dependencies": {
     "async": "^2.4.1",
