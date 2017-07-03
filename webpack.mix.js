@@ -213,6 +213,7 @@ if (__RUN === 'html' || (!__RUN && config.get('runTasks:html'))) {
   }
 
   webpackConfig = merge(webpackConfig, {
+    entry: entry.get(),
     module: {
       rules: [{
         test: /\.html$/,
