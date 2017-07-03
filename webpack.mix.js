@@ -209,7 +209,7 @@ if (__RUN === 'html' || (!__RUN && config.get('runTasks:html'))) {
   let entry = new Entry()
 
   for (let file of glob.sync('src/html/pages/*.html', { ignore: '**/_*' })) {
-    entry.add(entry.keys()[0], path.resolve(file))
+    entry.add('mix', path.resolve(file))
   }
 
   webpackConfig = merge(webpackConfig, {
