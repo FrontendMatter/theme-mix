@@ -268,7 +268,7 @@ webpackConfig = merge(webpackConfig, {
       }
     }]
   }
-}
+})
 
 ////////////////////
 // EXPOSE GLOBALS //
