@@ -250,12 +250,22 @@ if (Config.extractVueStyles) {
 
 // add node_modules to includePaths
 webpackConfig = merge(webpackConfig, {
+  resolve: {
+    alias: {
+      'vue$': 'vue/dist/vue.esm.js'
+    }
+  },
   module: {
     rules: [{
       test: /\.vue$/,
       loader: 'vue-loader',
+      exclude: /bower_components/,
       options: {
         loaders: Config.extractVueStyles ? {
+          js: {
+            loader: 'babel-loader',
+            options: Config.babel()
+          },
           scss: vueExtractPlugin.extract({
             use: 'css-loader!sass-loader?includePaths[]=node_modules',
             fallback: 'vue-style-loader'
@@ -263,8 +273,16 @@ webpackConfig = merge(webpackConfig, {
           sass: vueExtractPlugin.extract({
             use: 'css-loader!sass-loader?indentedSyntax&includePaths[]=node_modules',
             fallback: 'vue-style-loader'
-          })
+          }),
+          css: vueExtractPlugin.extract({
+            use: 'css-loader',
+            fallback: 'vue-style-loader'
+          }),
         }: {
+          js: {
+            loader: 'babel-loader',
+            options: Config.babel()
+          },
           scss: 'vue-style-loader!css-loader!sass-loader?includePaths[]=node_modules',
           sass: 'vue-style-loader!css-loader!sass-loader?indentedSyntax&includePaths[]=node_modules'
         }
