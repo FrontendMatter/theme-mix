@@ -304,8 +304,8 @@ if (config.get('expose')) {
 // APPLY CONFIG //
 //////////////////
 
-if (mix.config.webpackConfig) {
-  webpackConfig = merge(mix.config.webpackConfig, webpackConfig)
+if (Config.webpackConfig) {
+  webpackConfig = merge(Config.webpackConfig, webpackConfig)
 }
 
 mix.webpackConfig(webpackConfig)
