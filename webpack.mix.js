@@ -208,8 +208,9 @@ if (__RUN === 'html' || (!__RUN && config.get('runTasks:html'))) {
   let Entry = require('laravel-mix/src/builder/Entry')
   let entry = new Entry()
 
-  for (let file of glob.sync('src/html/pages/*.html', { ignore: '**/_*' })) {
-    entry.add('mix', path.resolve(file))
+  for (let file of glob.sync('*.html', { cwd: './src/html/pages', ignore: '**/_*' })) {
+    let output = path.join(Config.publicPath, path.join(file))
+    entry.add(output, path.resolve('./src/html/pages', file))
   }
 
   webpackConfig = merge(webpackConfig, {
