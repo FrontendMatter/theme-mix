@@ -8,7 +8,7 @@
     "front-matter-loader": "^0.1.2",
     "fs-simple-cache": "^1.0.0",
     "jsbeautify-loader": "^0.3.0",
-    "laravel-mix": "^0.10.0",
+    "laravel-mix": "^1.0.7",
     "lodash.merge": "^4.6.0",
     "merge-config": "^2.0.0",
     "nunjucks-html-loader": "github:lazabogdan/nunjucks-html-loader#front-matter",
@@ -23,5 +23,18 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FrontendMatter/theme-mix.git"
+  },
+  "keywords": [
+    "laravel-mix",
+    "webpack"
+  ],
+  "bugs": {
+    "url": "https://github.com/FrontendMatter/theme-mix/issues"
+  },
+  "homepage": "https://github.com/FrontendMatter/theme-mix#readme"
 }

@@ -24,6 +24,8 @@ config.merge({
   enableCssThemes: true,
   // create additional .rtl.css
   enableCssRTL: true,
+  // expose globals
+  expose: [],
   // copy assets list i.e. 
   // copyCwd: 'node_modules'
   // copyDest: 'dist/assets/vendor'
@@ -62,6 +64,12 @@ catch (e) {
     process.exit()
   }
 }
+
+///////////////////////////////
+// Apply Laravel Mix options //
+///////////////////////////////
+
+mix.options(config.get('laravelMixOptions'))
 
 ///////////////////////////////////////////
 // RUN SPECIFIC TASKS                    //
@@ -118,7 +126,15 @@ if (__RUN === 'copy' || (!__RUN && config.get('runTasks:copy'))) {
 // SASS //
 //////////
 
-mix.options(config.get('laravelMixOptions'))
+// Add node_modules to includePaths
+webpackConfig = merge(webpackConfig, {
+  module: {
+    rules: [{
+      test: /\.s[ac]ss$/,
+      loaders: ['style-loader', 'css-loader', 'sass-loader?includePaths[]=node_modules']
+    }]
+  }
+})
 
 // npm run development -- --env.theme dark
 const __THEME = argv.env ? argv.env.theme || 'default' : 'default'
@@ -126,9 +142,7 @@ const __THEME = argv.env ? argv.env.theme || 'default' : 'default'
 // npm run development -- --env.run sass
 if (__RUN === 'sass' || (!__RUN && config.get('runTasks:sass'))) {
   let __DIST_CSS = config.get('cssDest')
-  let sassOptions = { 
-    importer: require('sass-importer-npm'),
-  }
+  let sassOptions = {}
 
   if (config.get('enableCssThemes')) {
     // inject $theme variable
@@ -220,9 +234,77 @@ if (__RUN === 'html' || (!__RUN && config.get('runTasks:html'))) {
   })
 }
 
+/////////
+// Vue //
+/////////
+
+let vueExtractPlugin
+
+if (Config.extractVueStyles) {
+  let webpackRules = require('laravel-mix/src/builder/webpack-rules')
+  vueExtractPlugin = webpackRules.extractPlugins[webpackRules.extractPlugins.length - 1]
+}
+
+// add node_modules to includePaths
+webpackConfig = merge(webpackConfig, {
+  module: {
+    rules: [{
+      test: /\.vue$/,
+      loader: 'vue-loader',
+      options: {
+        loaders: Config.extractVueStyles ? {
+          scss: vueExtractPlugin.extract({
+            use: 'css-loader!sass-loader?includePaths[]=node_modules',
+            fallback: 'vue-style-loader'
+          }),
+          sass: vueExtractPlugin.extract({
+            use: 'css-loader!sass-loader?indentedSyntax&includePaths[]=node_modules',
+            fallback: 'vue-style-loader'
+          })
+        }: {
+          scss: 'vue-style-loader!css-loader!sass-loader?includePaths[]=node_modules',
+          sass: 'vue-style-loader!css-loader!sass-loader?indentedSyntax&includePaths[]=node_modules'
+        }
+      }
+    }]
+  }
+}
+
+////////////////////
+// EXPOSE GLOBALS //
+////////////////////
+
+if (config.get('expose')) {
+  const exposeConfig = {
+    module: {
+      rules: []
+    }
+  }
+
+  config.get('expose').forEach(expose => {
+    const library = Object.keys(expose)[0]
+    const globals = typeof expose[library] === 'string' 
+      ? [expose[library]] 
+      : expose[library]
+
+    const rule = {
+      test: require.resolve(library),
+      use: []
+    }
+    globals.forEach(name => rule.use.push({ loader: 'expose-loader', options: name }))
+    exposeConfig.module.rules.push(rule)
+  })
+
+  webpackConfig = merge(webpackConfig, exposeConfig)
+}
+
 //////////////////
 // APPLY CONFIG //
 //////////////////
+
+if (mix.config.webpackConfig) {
+  webpackConfig = merge(mix.config.webpackConfig, webpackConfig)
+}
 
 mix.webpackConfig(webpackConfig)
 
