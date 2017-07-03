@@ -285,7 +285,10 @@ webpackConfig = merge(webpackConfig, {
           },
           scss: 'vue-style-loader!css-loader!sass-loader?includePaths[]=node_modules',
           sass: 'vue-style-loader!css-loader!sass-loader?indentedSyntax&includePaths[]=node_modules'
-        }
+        },
+        postcss: Config.postCss,
+        preLoaders: Config.vue.preLoaders,
+        postLoaders: Config.vue.postLoaders
       }
     }]
   }
