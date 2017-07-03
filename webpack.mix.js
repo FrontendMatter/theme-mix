@@ -1,5 +1,4 @@
 const { mix } = require('laravel-mix')
-const Mix     = mix.config
 const glob    = require('glob')
 const argv    = require('yargs').argv
 const del     = require('del')
@@ -10,8 +9,8 @@ let webpackConfig = {}
 // Configuration //
 ///////////////////
 
-const Config = require('merge-config')
-let config = new Config()
+const MergeConfig = require('merge-config')
+let config = new MergeConfig()
 
 config.merge({
   runTasks: {
@@ -206,8 +205,11 @@ if (__RUN === 'sass' || (!__RUN && config.get('runTasks:sass'))) {
 
 // npm run development -- --env.run html
 if (__RUN === 'html' || (!__RUN && config.get('runTasks:html'))) {
+  let Entry = require('laravel-mix/src/builder/Entry')
+  let entry = new Entry()
+
   for (let file of glob.sync('src/html/pages/*.html', { ignore: '**/_*' })) {
-    Mix.entry().entry.add('mix', path.resolve(file))
+    entry.add(entry.keys()[0], path.resolve(file))
   }
 
   webpackConfig = merge(webpackConfig, {
