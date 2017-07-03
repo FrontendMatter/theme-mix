@@ -221,8 +221,8 @@ if (__RUN === 'html' || (!__RUN && config.get('runTasks:html'))) {
           loader: 'file-loader',
           options: {
             name: config.get('htmlDest'),
-            context: './src/html/pages/',
-            useRelativePath: true
+            context: './src/html/pages',
+            useRelativePath: false
           }
         }, 'jsbeautify-loader', {
           loader: 'nunjucks-html-loader',
