@@ -125,23 +125,16 @@ if (__RUN === 'copy' || (!__RUN && config.get('runTasks:copy'))) {
 // SASS //
 //////////
 
-// Add node_modules to includePaths
-webpackConfig = merge(webpackConfig, {
-  module: {
-    rules: [{
-      test: /\.s[ac]ss$/,
-      loaders: ['style-loader', 'css-loader', 'sass-loader?includePaths[]=node_modules']
-    }]
-  }
-})
-
 // npm run development -- --env.theme dark
 const __THEME = argv.env ? argv.env.theme || 'default' : 'default'
 
 // npm run development -- --env.run sass
 if (__RUN === 'sass' || (!__RUN && config.get('runTasks:sass'))) {
   let __DIST_CSS = config.get('cssDest')
-  let sassOptions = {}
+  let sassOptions = {
+    // Add node_modules to includePaths
+    includePaths: ['node_modules']
+  }
 
   if (config.get('enableCssThemes')) {
     // inject $theme variable
@@ -208,7 +201,7 @@ if (__RUN === 'html' || (!__RUN && config.get('runTasks:html'))) {
   let Entry = require('laravel-mix/src/builder/Entry')
   let entry = new Entry()
 
-  for (let file of glob.sync('./src/html/pages/*.html', { ignore: '**/_*' })) {
+  for (let file of glob.sync('src/html/pages/*.html', { ignore: '**/_*' })) {
     entry.add('mix', path.resolve(file))
   }
 
@@ -245,16 +238,11 @@ let vueExtractPlugin
 
 if (Config.extractVueStyles) {
   let webpackRules = require('laravel-mix/src/builder/webpack-rules')
-  vueExtractPlugin = webpackRules.extractPlugins[webpackRules.extractPlugins.length - 1]
+  vueExtractPlugin = webpackRules.extractPlugins[0]
 }
 
 // add node_modules to includePaths
 webpackConfig = merge(webpackConfig, {
-  resolve: {
-    alias: {
-      'vue$': 'vue/dist/vue.esm.js'
-    }
-  },
   module: {
     rules: [{
       test: /\.vue$/,
@@ -278,6 +266,14 @@ webpackConfig = merge(webpackConfig, {
             use: 'css-loader',
             fallback: 'vue-style-loader'
           }),
+          stylus: vueExtractPlugin.extract({
+            use: 'css-loader!stylus-loader?paths[]=node_modules',
+            fallback: 'vue-style-loader'
+          }),
+          less: vueExtractPlugin.extract({
+            use: 'css-loader!less-loader',
+            fallback: 'vue-style-loader'
+          }),
         }: {
           js: {
             loader: 'babel-loader',
@@ -288,7 +284,8 @@ webpackConfig = merge(webpackConfig, {
         },
         postcss: Config.postCss,
         preLoaders: Config.vue.preLoaders,
-        postLoaders: Config.vue.postLoaders
+        postLoaders: Config.vue.postLoaders,
+        esModule: Config.vue.esModule
       }
     }]
   }
