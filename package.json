@@ -8,7 +8,7 @@
     "front-matter-loader": "^0.1.2",
     "fs-simple-cache": "^1.0.0",
     "jsbeautify-loader": "^0.3.0",
-    "laravel-mix": "~1.5",
+    "laravel-mix": "^2.0.0",
     "lodash.merge": "^4.6.0",
     "merge-config": "^2.0.0",
     "nunjucks-html-loader": "github:lazabogdan/nunjucks-html-loader#front-matter",
