@@ -95,6 +95,7 @@ cssDest: dist/assets/css
 jsSrc: src/js/**/**.{js,vue}
 jsDest: dist/assets/js
 htmlDest: dist/[path][name].html
+htmllint: true,
 laravelMixOptions:
   processCssUrls: false
 browserSync:
@@ -108,4 +109,24 @@ browserSync:
   ghostMode: false
   logLevel: silent
   proxy: null
+```
+
+## HTML Validation
+
+> Java Development Kit > v8 required.
+
+```bash
+java -version
+```
+
+> Start the vnu-jar server on localhost port 8888.
+
+```bash
+java -cp node_modules/vnu-jar/build/dist/vnu.jar nu.validator.servlet.Main 8888
+```
+
+> Now you can build/watch HTML with W3C validation.
+
+```bash
+npm run development -- --env.run html
 ```

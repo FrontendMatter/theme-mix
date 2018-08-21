@@ -42,6 +42,7 @@ config.merge({
   jsSrc: 'src/js/**/**.{js,vue}',
   jsDest: 'dist/assets/js',
   htmlDest: 'dist/[path][name].html',
+  htmllint: true,
   // options passed to laravel-mix
   laravelMixOptions: {
     // ignore fonts
@@ -205,29 +206,51 @@ if (__RUN === 'html' || (!__RUN && config.get('runTasks:html'))) {
     entry.add('mix', path.resolve(file))
   }
 
+  let loaders = [{
+    loader: 'file-loader',
+    options: {
+      name: config.get('htmlDest'),
+      context: './src/html/pages',
+      useRelativePath: false
+    }
+  }]
+
+  if (config.get('htmllint')) {
+    loaders.push({
+      loader: 'html-validate-loader'
+    })
+  }
+
+  loaders = loaders.concat(['jsbeautify-loader', {
+    loader: 'nunjucks-html-loader',
+    options: {
+      searchPaths: [
+        './src/html'
+      ]
+    }
+  }, 'front-matter-loader'])
+
   webpackConfig = merge(webpackConfig, {
     entry: entry.get(),
+    resolveLoader: {
+      alias: {
+        'html-validate-loader': path.join(__dirname, './htmllint/webpack-html-validate-loader.js'),
+      }
+    },
     module: {
       rules: [{
         test: /\.html$/,
-        loaders: [{
-          loader: 'file-loader',
-          options: {
-            name: config.get('htmlDest'),
-            context: './src/html/pages',
-            useRelativePath: false
-          }
-        }, 'jsbeautify-loader', {
-          loader: 'nunjucks-html-loader',
-          options: {
-            searchPaths: [
-              './src/html'
-            ]
-          }
-        }, 'front-matter-loader']
+        loaders
       }]
     }
   })
+
+  // const WebpackHTMLValidatePlugin = require('./htmllint/webpack-html-validate-plugin')
+  // webpackConfig = merge(webpackConfig, {
+  //   plugins: [
+  //     new WebpackHTMLValidatePlugin()
+  //   ]
+  // })
 }
 
 /////////
@@ -335,4 +358,9 @@ mix.webpackConfig(webpackConfig)
 
 if (!__RUN) {
   mix.browserSync(config.get('browserSync'))
+}
+
+module.exports = {
+  mix,
+  config
 }
