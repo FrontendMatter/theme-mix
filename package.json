@@ -1,6 +1,6 @@
 {
   "name": "theme-mix",
-  "version": "0.6.0",
+  "version": "1.0.0",
   "author": "FrontendMatter <contact@frontendmatter.com> (http://www.frontendmatter.com)",
   "dependencies": {
     "async": "^2.4.1",
@@ -8,7 +8,7 @@
     "front-matter-loader": "^0.1.2",
     "fs-simple-cache": "^1.1.0",
     "jsbeautify-loader": "^0.3.0",
-    "laravel-mix": "^2.0.0",
+    "laravel-mix": "^2.1.14",
     "lodash.merge": "^4.6.0",
     "merge-config": "^2.0.0",
     "nunjucks-html-loader": "github:lazabogdan/nunjucks-html-loader#front-matter",

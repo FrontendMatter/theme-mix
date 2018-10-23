@@ -253,67 +253,6 @@ if (__RUN === 'html' || (!__RUN && config.get('runTasks:html'))) {
   // })
 }
 
-/////////
-// Vue //
-/////////
-
-let vueExtractPlugin
-
-if (Config.extractVueStyles) {
-  let webpackRules = require('laravel-mix/src/builder/webpack-rules')
-  vueExtractPlugin = webpackRules.extractPlugins[0]
-}
-
-// add node_modules to includePaths
-webpackConfig = merge(webpackConfig, {
-  module: {
-    rules: [{
-      test: /\.vue$/,
-      loader: 'vue-loader',
-      exclude: /bower_components/,
-      options: {
-        loaders: Config.extractVueStyles ? {
-          js: {
-            loader: 'babel-loader',
-            options: Config.babel()
-          },
-          scss: vueExtractPlugin.extract({
-            use: 'css-loader!sass-loader?includePaths[]=node_modules',
-            fallback: 'vue-style-loader'
-          }),
-          sass: vueExtractPlugin.extract({
-            use: 'css-loader!sass-loader?indentedSyntax&includePaths[]=node_modules',
-            fallback: 'vue-style-loader'
-          }),
-          css: vueExtractPlugin.extract({
-            use: 'css-loader',
-            fallback: 'vue-style-loader'
-          }),
-          stylus: vueExtractPlugin.extract({
-            use: 'css-loader!stylus-loader?paths[]=node_modules',
-            fallback: 'vue-style-loader'
-          }),
-          less: vueExtractPlugin.extract({
-            use: 'css-loader!less-loader',
-            fallback: 'vue-style-loader'
-          }),
-        }: {
-          js: {
-            loader: 'babel-loader',
-            options: Config.babel()
-          },
-          scss: 'vue-style-loader!css-loader!sass-loader?includePaths[]=node_modules',
-          sass: 'vue-style-loader!css-loader!sass-loader?indentedSyntax&includePaths[]=node_modules'
-        },
-        postcss: Config.postCss,
-        preLoaders: Config.vue.preLoaders,
-        postLoaders: Config.vue.postLoaders,
-        esModule: Config.vue.esModule
-      }
-    }]
-  }
-})
-
 ////////////////////
 // EXPOSE GLOBALS //
 ////////////////////
