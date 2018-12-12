@@ -1,4 +1,4 @@
-const { mix } = require('laravel-mix')
+const mix     = require('laravel-mix')
 const glob    = require('glob')
 const argv    = require('yargs').argv
 const del     = require('del')
@@ -71,6 +71,34 @@ catch (e) {
 
 mix.options(config.get('laravelMixOptions'))
 
+/////////////
+// Aliases //
+/////////////
+
+mix.webpackConfig({
+  resolve: {
+    extensions: ['.js', '.vue'],
+    alias: {
+      '~': __dirname + '/src'
+    }
+  }
+})
+
+////////////////
+// Sourcemaps //
+////////////////
+
+// Enable sourcemaps
+const sourceMapsInProduction = false
+mix.sourceMaps(sourceMapsInProduction)
+
+// https://github.com/JeffreyWay/laravel-mix/issues/1793
+if (!mix.inProduction()) {
+  mix.webpackConfig({
+    devtool: 'inline-source-map'
+  })
+}
+
 ///////////////////////////////////////////
 // RUN SPECIFIC TASKS                    //
 // npm run development -- --env.run html //
@@ -129,9 +157,49 @@ if (__RUN === 'copy' || (!__RUN && config.get('runTasks:copy'))) {
 // npm run development -- --env.theme dark
 const __THEME = argv.env ? argv.env.theme || 'default' : 'default'
 
+mix.extend('addSassIncludePaths', function(webpackConfig) {
+  const Vue = require('laravel-mix/src/components/Vue')
+  const vue = new Vue()
+  const options = {
+    includePaths: ['node_modules', 'src/sass']
+  }
+
+  if (Config.extractVueStyles) {
+    let ExtractTextPlugin = require('extract-text-webpack-plugin')
+    let plugin = webpackConfig.plugins.findIndex(plugin => plugin instanceof ExtractTextPlugin)
+    webpackConfig.plugins.splice(plugin, 1)
+  }
+
+  let { VueLoaderPlugin } = require('vue-loader')
+  let plugin = webpackConfig.plugins.find(plugin => plugin instanceof VueLoaderPlugin)
+  if (!plugin) {
+    webpackConfig.plugins.push(new VueLoaderPlugin())
+  }
+
+  // SCSS
+  vue.updateCssLoader(
+    'scss',
+    [
+      'css-loader',
+      {
+        loader: 'sass-loader',
+        options: Config.globalVueStyles
+          ? Object.assign({}, options, {
+            resources: Mix.paths.root(Config.globalVueStyles)
+          })
+          : Object.assign({}, options)
+      }
+    ],
+    webpackConfig
+  )
+})
+
+mix.addSassIncludePaths()
+
 // npm run development -- --env.run sass
 if (__RUN === 'sass' || (!__RUN && config.get('runTasks:sass'))) {
   let __DIST_CSS = config.get('cssDest')
+
   let sassOptions = {
     // Add node_modules to includePaths
     includePaths: ['node_modules']
@@ -244,13 +312,6 @@ if (__RUN === 'html' || (!__RUN && config.get('runTasks:html'))) {
       }]
     }
   })
-
-  // const WebpackHTMLValidatePlugin = require('./htmllint/webpack-html-validate-plugin')
-  // webpackConfig = merge(webpackConfig, {
-  //   plugins: [
-  //     new WebpackHTMLValidatePlugin()
-  //   ]
-  // })
 }
 
 ////////////////////
