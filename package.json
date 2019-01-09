@@ -1,6 +1,6 @@
 {
   "name": "theme-mix",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "author": "FrontendMatter <contact@frontendmatter.com> (http://www.frontendmatter.com)",
   "dependencies": {
     "async": "^2.4.1",
@@ -10,7 +10,7 @@
     "front-matter-loader": "^0.2.0",
     "fs-simple-cache": "^1.2.0",
     "jsbeautify-loader": "^0.3.0",
-    "laravel-mix": "^4.0.4",
+    "laravel-mix": "4.0.4",
     "lodash.merge": "^4.6.0",
     "merge-config": "^2.0.0",
     "node-sass": "^4.11.0",
