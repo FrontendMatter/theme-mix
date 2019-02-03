@@ -77,8 +77,18 @@ runTasks:
   copy: true
   sass: true
   html: true
-enableCssThemes: true
-enableCssRTL: true
+# injects $theme Sass variable
+enableCssThemes: false
+# create additional .rtl.css
+enableCssRTL: false
+# expose globals
+expose: []
+# copy assets list i.e. 
+# copyCwd: node_modules
+# copyDest: dist/assets/vendor
+# copy: 
+#  - bootstrap/dist/bootstrap.js
+# => will copy node_modules/bootstrap/dist/bootstrap.js to dist/assets/vendor/bootstrap.js
 copyCwd: node_modules
 copyDest: dist/assets/vendor
 copy:
@@ -94,8 +104,10 @@ sassSrc: src/sass/*.scss
 cssDest: dist/assets/css
 jsSrc: src/js/**/**.{js,vue}
 jsDest: dist/assets/js
+htmlSearchPaths:
+  - ./src/html
 htmlDest: dist/[path][name].html
-htmllint: true,
+htmllint: false
 laravelMixOptions:
   processCssUrls: false
 browserSync:

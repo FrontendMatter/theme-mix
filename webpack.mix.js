@@ -20,9 +20,9 @@ config.merge({
     sass: true,
     html: true,
   },
-  enableCssThemes: true,
+  enableCssThemes: false,
   // create additional .rtl.css
-  enableCssRTL: true,
+  enableCssRTL: false,
   // expose globals
   expose: [],
   // copy assets list i.e. 
@@ -41,6 +41,9 @@ config.merge({
   cssDest: 'dist/assets/css',
   jsSrc: 'src/js/**/**.{js,vue}',
   jsDest: 'dist/assets/js',
+  htmlSearchPaths: [
+    './src/html'
+  ],
   htmlDest: 'dist/[path][name].html',
   htmllint: true,
   // options passed to laravel-mix
@@ -194,10 +197,10 @@ mix.extend('addSassIncludePaths', function(webpackConfig) {
   )
 })
 
-mix.addSassIncludePaths()
-
 // npm run development -- --env.run sass
 if (__RUN === 'sass' || (!__RUN && config.get('runTasks:sass'))) {
+  mix.addSassIncludePaths()
+
   let __DIST_CSS = config.get('cssDest')
 
   let sassOptions = {
@@ -239,26 +242,6 @@ if (__RUN === 'sass' || (!__RUN && config.get('runTasks:sass'))) {
       ]
     })
   }
-
-  ///////////////////////////////////
-  // WRAP CSS with .theme-$__THEME //
-  ///////////////////////////////////
-
-  if (config.get('enableCssThemes')) {
-    const WebpackWrapThemePlugin = require('./webpack-wrap-theme-plugin')
-    const cacheDirectory = path.resolve(path.join('temp', 'themeClass', __THEME))
-
-    del.sync(cacheDirectory)
-
-    webpackConfig = merge(webpackConfig, {
-      plugins: [
-        new WebpackWrapThemePlugin({ 
-          themeClass: '.theme-' + __THEME,
-          cacheDirectory
-        })
-      ]
-    })
-  }
 }
 
 //////////////
@@ -292,9 +275,7 @@ if (__RUN === 'html' || (!__RUN && config.get('runTasks:html'))) {
   loaders = loaders.concat(['jsbeautify-loader', {
     loader: 'nunjucks-html-loader',
     options: {
-      searchPaths: [
-        './src/html'
-      ]
+      searchPaths: config.get('htmlSearchPaths')
     }
   }, 'front-matter-loader'])
 
