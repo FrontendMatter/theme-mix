@@ -3,6 +3,7 @@ const glob    = require('glob')
 const argv    = require('yargs').argv
 const del     = require('del')
 const merge   = require('webpack-merge').smart
+const webpack = require('webpack')
 let webpackConfig = {}
 
 ///////////////////
@@ -20,8 +21,6 @@ config.merge({
     sass: true,
     html: true,
   },
-  enableCssThemes: false,
-  // create additional .rtl.css
   enableCssRTL: false,
   // expose globals
   expose: [],
@@ -41,6 +40,8 @@ config.merge({
   cssDest: 'dist/assets/css',
   jsSrc: 'src/js/**/**.{js,vue}',
   jsDest: 'dist/assets/js',
+  htmlSrc: 'src/html/pages/**/**.html',
+  htmlContext: './src/html/pages',
   htmlSearchPaths: [
     './src/html'
   ],
@@ -73,6 +74,7 @@ catch (e) {
 ///////////////////////////////
 
 mix.options(config.get('laravelMixOptions'))
+mix.setPublicPath('.')
 
 /////////////
 // Aliases //
@@ -157,9 +159,7 @@ if (__RUN === 'copy' || (!__RUN && config.get('runTasks:copy'))) {
 // SASS //
 //////////
 
-// npm run development -- --env.theme dark
-const __THEME = argv.env ? argv.env.theme || 'default' : 'default'
-
+// npm run development -- --env.run sass
 mix.extend('addSassIncludePaths', function(webpackConfig) {
   const Vue = require('laravel-mix/src/components/Vue')
   const vue = new Vue()
@@ -208,37 +208,19 @@ if (__RUN === 'sass' || (!__RUN && config.get('runTasks:sass'))) {
     includePaths: ['node_modules']
   }
 
-  if (config.get('enableCssThemes')) {
-    // inject $theme variable
-    sassOptions.data = '$theme: ' + __THEME + ';'
-    __DIST_CSS += '/themes/' + __THEME
-  }
-
   for (let file of glob.sync(config.get('sassSrc'), { ignore: '**/_*' })) {
     mix.sass(file, __DIST_CSS, sassOptions)
   }
+
 
   /////////
   // RTL //
   /////////
 
   if (config.get('enableCssRTL')) {
-    const WebpackRTLPlugin = require('webpack-rtl-plugin')
-    const WebpackRTLWrapPlugin = require('webpack-rtl-wrap-plugin')
-    const cacheDirectory = path.resolve(path.join('temp', 'rtl', __THEME))
-
-    del.sync(cacheDirectory)
-
-    webpackConfig = merge(webpackConfig, { 
-      plugins: [
-        // Creates .rtl.css
-        new WebpackRTLPlugin({
-          minify: false
-        }),
-        // wraps CSS into [dir=ltr|rtl]
-        new WebpackRTLWrapPlugin({
-          cacheDirectory
-        })
+    mix.options({
+      postCss: [
+        require('postcss-rtl')
       ]
     })
   }
@@ -253,7 +235,7 @@ if (__RUN === 'html' || (!__RUN && config.get('runTasks:html'))) {
   let Entry = require('laravel-mix/src/builder/Entry')
   let entry = new Entry()
 
-  for (let file of glob.sync('src/html/pages/*.html', { ignore: '**/_*' })) {
+  for (let file of glob.sync(config.get('htmlSrc'), { ignore: '**/_*' })) {
     entry.add('mix', path.resolve(file))
   }
 
@@ -261,7 +243,7 @@ if (__RUN === 'html' || (!__RUN && config.get('runTasks:html'))) {
     loader: 'file-loader',
     options: {
       name: config.get('htmlDest'),
-      context: './src/html/pages',
+      context: config.get('htmlContext'),
       useRelativePath: false
     }
   }]
@@ -330,6 +312,44 @@ if (config.get('expose')) {
 if (Config.webpackConfig) {
   webpackConfig = merge(Config.webpackConfig, webpackConfig)
 }
+
+mix.webpackConfig({
+  plugins: [
+     new webpack.LoaderOptionsPlugin({
+      // test: /\.xxx$/, // may apply this only for some modules
+      options: {
+        jsBeautify: {
+          "html": {
+            "allowed_file_extensions": ["html", "xhtml", "shtml", "xml", "svg"],
+            "indent_size": 4,
+            "indent_inner_html": true,
+            "wrap_attributes": "force-aligned",
+            "max_preserve_newlines": 1
+          }
+        }
+      }
+    })
+  ],
+  resolve: { 
+    symlinks: false,
+    modules: [
+      path.resolve(__dirname, '..', 'node_modules'),
+      'node_modules'
+    ],
+  },
+  module: {
+    rules: [{
+      test: /\.jsx?$/,
+      exclude: /(node_modules\/(core-js|@babel\b)|bower_components)/,
+      use: [
+        {
+          loader: 'babel-loader',
+          options: Config.babel()
+        }
+      ]
+    }]
+  }
+})
 
 mix.webpackConfig(webpackConfig)
 
